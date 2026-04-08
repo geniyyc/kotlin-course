@@ -1,6 +1,6 @@
-plugins {
-    kotlin("jvm") apply false
-}
+//plugins {
+//    id("build-jvm") apply false
+//}
 
 group = "io.github.geniyyc"
 version = "0.0.1"
