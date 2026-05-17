@@ -15,4 +15,5 @@ pluginManagement {
     }
 }
 
+include(":math-face-specs")
 rootProject.name = "math-face"
