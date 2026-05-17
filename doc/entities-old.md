@@ -2,7 +2,7 @@
 
 ## Схема сущностей
 
-![mf-mvp-api-v2.drawio.svg](files/mf-mvp-api-v2.drawio.svg)
+![mf-mvp-api.drawio.svg](files/mf-mvp-api.drawio.svg)
 
 ## Описание сущностей
 
@@ -14,8 +14,11 @@ Complexity - уровень сложности
 
 Expression - конкретная задача\пример для решения. 
 - complexity_id - id сложности выражения примера
+- solution_id - id решения
 - value - конкретный пример с решением("2 + 4")
 - create_time - время создания
 - solution_time - время решения
-- solution_value - решение("6)
+
+Solution - решение конкретной задачи.
+- value - решение("6)
 - description - описание решения
