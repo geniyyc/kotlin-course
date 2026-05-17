@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: MathFace API
+  description: |
+    API платформы MathFace для генерации математических примеров с прогрессией сложности и проверки решений.
+    Основные возможности:
+    - Получение набора примеров определённой сложности
+    - Отправка решения для конкретного примера
+  version: 1.0.0
+  contact:
+    name: MathFace Team
+    email: dev@mathface.io
+servers:
+  - url: https://api.mathface.io/v1
+    description: Production сервер
+  - url: http://localhost:8000/v1
+    description: Локальная разработка
+security:
+  - bearerAuth: []
+paths:
+  /expressions:
+    get:
+      summary: Получить три примера заданной сложности
+      description: Возвращает три случайных математических выражения (задачи) для указанного уровня сложности. Если сложность не указана, система может определить уровень пользователя (реализуется в будущем).
+      operationId: getExpressions
+      parameters:
+        - name: complexity_id
+          in: query
+          required: true
+          description: Идентификатор уровня сложности (целое число)
+          schema:
+            type: integer
+            example: 2
+      responses:
+        '200':
+          description: Массив из трёх выражений
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Expression'
+                    minItems: 3
+                    maxItems: 3
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Уровень сложности не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /expressions/{expression_id}/solution:
+    post:
+      summary: Отправить решение примера
+      description: Пользователь отправляет свой ответ для указанного выражения. Система проверяет корректность, фиксирует время решения и возвращает обновлённый объект выражения с результатом проверки.
+      operationId: submitSolution
+      parameters:
+        - name: expression_id
+          in: path
+          required: true
+          description: Уникальный идентификатор выражения
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - solution_value
+              properties:
+                solution_value:
+                  type: string
+                  description: Ответ пользователя (в виде строки, например "6")
+                  example: "6"
+      responses:
+        '200':
+          description: Решение успешно отправлено и проверено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  expression:
+                    $ref: '#/components/schemas/Expression'
+                  is_correct:
+                    type: boolean
+                    description: Признак правильности ответа
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Выражение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Решение уже было отправлено ранее
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Токен доступа (JWT), полученный при аутентификации
+  schemas:
+    Expression:
+      type: object
+      required:
+        - id
+        - complexity_id
+        - value
+        - create_time
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор выражения
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        complexity_id:
+          type: integer
+          description: Идентификатор уровня сложности, к которому относится пример
+          example: 2
+        value:
+          type: string
+          description: Математическое выражение для решения, например "2 + 4"
+          example: "2 + 4"
+        description:
+          type: string
+          description: Пояснение или подсказка к решению
+          example: "Сложение двух целых чисел"
+        create_time:
+          type: string
+          format: date-time
+          description: Время создания примера (UTC)
+          example: "2025-05-18T12:00:00Z"
+        solution_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: Время отправки решения (UTC). Если решение не отправлено, поле отсутствует или null.
+          example: "2025-05-18T12:05:30Z"
+        solution_value:
+          type: string
+          nullable: true
+          description: Ответ пользователя (если был отправлен)
+          example: "6"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Код ошибки
+          example: "COMPLEXITY_NOT_FOUND"
+        message:
+          type: string
+          description: Человекочитаемое сообщение
+          example: "Уровень сложности с ID 99 не найден"
+  responses:
+    BadRequest:
+      description: Некорректный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            example:
+              code: "UNAUTHORIZED"
+              message: "Отсутствует или недействителен токен доступа"
