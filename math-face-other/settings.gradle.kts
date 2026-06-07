@@ -1,3 +1,5 @@
+rootProject.name = "math-face-other"
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
@@ -16,4 +18,6 @@ pluginManagement {
 }
 
 include(":math-face-specs")
-rootProject.name = "math-face"
+include(":math-face-swagger")
+include(":math-face-dcompose")
+
