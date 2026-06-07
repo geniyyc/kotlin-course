@@ -1,0 +1,50 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam ParticipantPadding 20
+
+title Адаптивная генерация примеров
+
+actor "Пользователь" as User
+participant "Client App" as UI
+participant "Backend" as BE
+
+== 1. Выбор уровня сложности ==
+User -> UI : Выбирает уровень сложности (Level N)
+UI -> BE : POST /expression/generate\nbody: {level: N}
+
+note right of BE
+  **Генерация 10 примеров**
+end note
+
+BE --> UI : 200 OK\n{task_id, examples[]}
+UI -> User : Отображает примеры для решения
+
+== 2. Отправка ответов ==
+User -> UI : Решает примеры и нажимает "Отправить"
+UI -> BE : POST /expression/{group_id}/submit\nbody: {answers[]}
+
+== 3. Анализ и решение об уровне ==
+note right of BE
+  **Логика анализа:**
+  1. Сверить ответы пользователя с правильными
+  2. Подсчитать successRate (см. доку)
+  3. Записать результат в прогресс пользователя
+  4. Определить статус:
+     - successRate < 75% → STAY
+     - successRate >= 75% → LEVEL_UP
+     - successRate >= 85% → LEVEL_UP_2
+end note
+
+alt successRate < 75%
+    BE --> UI : 200 OK\n{result: "STAY", message: "Попробуйте ещё раз"}
+    UI -> User : "Повторите уровень N с новыми примерами"
+else successRate >= 75%
+    BE --> UI : 200 OK\n{result: "LEVEL_UP", message: "Уровень повышен!"}
+    UI -> User : "Отлично! Переходим на уровень N+1"
+else successRate >= 85%
+    BE --> UI : 200 OK\n{result: "LEVEL_UP_2", message: "Супер повышение уровня!"}
+    UI -> User : "Невироятно! Переходим на уровень N+2"
+end
+
+@enduml
