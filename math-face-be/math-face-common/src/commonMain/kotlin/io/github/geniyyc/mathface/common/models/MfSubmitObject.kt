@@ -1,6 +1,6 @@
 package io.github.geniyyc.mathface.common.models
 
 data class MfSubmitObject(
-    var groupId: String = "",
-    val answers: MutableList<MfSolution> = mutableListOf(),
+    var expressionId: MfExpressionId = MfExpressionId.NONE,
+    var answer: String = "",
 )

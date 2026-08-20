@@ -1,0 +1,8 @@
+ktor:
+  development: true
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - io.github.geniyyc.mathface.app.ktor.ApplicationKt.module
+  logger: logback

@@ -7,7 +7,6 @@ import io.github.geniyyc.api.v1.models.ExpressionSubmitRequest
 import io.github.geniyyc.api.v1.models.ExpressionSubmitResponse
 import io.github.geniyyc.api.v1.models.GenerateObject
 import io.github.geniyyc.api.v1.models.ResponseResult
-import io.github.geniyyc.api.v1.models.SubmitAnswerObject
 import io.github.geniyyc.api.v1.models.SubmitObject
 import io.github.geniyyc.mathface.common.MfContext
 import io.github.geniyyc.mathface.common.models.MfCommand
@@ -16,15 +15,17 @@ import io.github.geniyyc.mathface.common.models.MfError
 import io.github.geniyyc.mathface.common.models.MfExpression
 import io.github.geniyyc.mathface.common.models.MfExpressionFilter
 import io.github.geniyyc.mathface.common.models.MfExpressionId
+import io.github.geniyyc.mathface.common.models.MfExpressionSet
 import io.github.geniyyc.mathface.common.models.MfRequestId
-import io.github.geniyyc.mathface.common.models.MfSolution
 import io.github.geniyyc.mathface.common.models.MfState
 import io.github.geniyyc.mathface.common.models.MfStubs
 import io.github.geniyyc.mathface.common.models.MfSubmitObject
 import io.github.geniyyc.mathface.common.models.MfSubmitResponse
+import io.github.geniyyc.mathface.common.models.MfUserId
 import io.github.geniyyc.mathface.common.models.MfWorkMode
 import io.github.geniyyc.mathface.mappers.v1.fromTransport
 import io.github.geniyyc.mathface.mappers.v1.toTransportExpression
+import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -57,15 +58,8 @@ class MapperTest {
                 stub = ExpressionRequestDebugStubs.BAD_ID,
             ),
             expression = SubmitObject(
-                groupId = "group-1",
-                answers = listOf(
-                    SubmitAnswerObject(
-                        expressionId = "expr-1",
-                        expressionValue = "2 + 2",
-                        solutionValue = "42",
-                        solutionTime = "2024-01-01T00:00:00Z"
-                    )
-                )
+                expressionId = "expr-1",
+                answer = "42",
             )
         )
 
@@ -75,10 +69,8 @@ class MapperTest {
         assertEquals(MfStubs.BAD_ID, context.stubCase)
         assertEquals(MfWorkMode.TEST, context.workMode)
         assertEquals(MfCommand.SUBMIT, context.command)
-        assertEquals("group-1", context.submitRequest.groupId)
-        assertEquals(1, context.submitRequest.answers.size)
-        assertEquals("expr-1", context.submitRequest.answers.first().expressionId.asString())
-        assertEquals("2 + 2", context.submitRequest.answers.first().expressionValue)
+        assertEquals("expr-1", context.submitRequest.expressionId.asString())
+        assertEquals("42", context.submitRequest.answer)
     }
 
     @Test
@@ -88,11 +80,17 @@ class MapperTest {
             command = MfCommand.GENERATE,
             taskId = "task-abc",
             expressionsResponse = mutableListOf(
-                MfExpression(
-                    id = MfExpressionId("expr-1"),
-                    value = "2 + 2",
-                    complexityId = MfComplexityId(1),
-                    description = "Simple",
+                MfExpressionSet(
+                    ownerId = MfUserId("owner-1"),
+                    expressions = mutableListOf(
+                        MfExpression(
+                            id = MfExpressionId("expr-1"),
+                            value = "2 + 2",
+                            complexityId = MfComplexityId(1),
+                            description = "Simple",
+                        )
+                    ),
+                    startTime = Instant.parse("2024-01-01T00:00:00Z"),
                 )
             ),
             errors = mutableListOf(
@@ -110,8 +108,10 @@ class MapperTest {
 
         assertEquals("task-abc", res.taskId)
         assertEquals(1, res.expressions?.size)
-        assertEquals("expr-1", res.expressions?.firstOrNull()?.id)
-        assertEquals(1, res.expressions?.firstOrNull()?.complexityId)
+        assertEquals("owner-1", res.expressions?.firstOrNull()?.ownerId)
+        assertEquals(1, res.expressions?.firstOrNull()?.expressions?.size)
+        assertEquals("expr-1", res.expressions?.firstOrNull()?.expressions?.firstOrNull()?.id)
+        assertEquals(1, res.expressions?.firstOrNull()?.expressions?.firstOrNull()?.complexityId)
         assertEquals(ResponseResult.SUCCESS, res.result)
         assertEquals(1, res.errors?.size)
         assertEquals("err", res.errors?.firstOrNull()?.code)
@@ -123,9 +123,10 @@ class MapperTest {
             requestId = MfRequestId("5678"),
             command = MfCommand.SUBMIT,
             submitResponse = MfSubmitResponse(
-                decision = "LEVEL_UP",
+                result = "LEVEL_UP",
                 message = "Good job!",
                 nextLevel = 3,
+                endTime = Instant.parse("2024-01-01T00:00:00Z"),
             ),
             state = MfState.FINISHING,
         )
@@ -135,6 +136,7 @@ class MapperTest {
         assertEquals("LEVEL_UP", res.decision)
         assertEquals("Good job!", res.message)
         assertEquals(3, res.nextLevel)
+        assertEquals("2024-01-01T00:00:00Z", res.endTime)
         assertEquals(ResponseResult.SUCCESS, res.result)
     }
 }

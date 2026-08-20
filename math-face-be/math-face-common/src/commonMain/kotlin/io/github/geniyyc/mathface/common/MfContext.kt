@@ -18,6 +18,6 @@ data class MfContext(
     var submitRequest: MfSubmitObject = MfSubmitObject(),
 
     var taskId: String = "",
-    var expressionsResponse: MutableList<MfExpression> = mutableListOf(),
+    var expressionsResponse: MutableList<MfExpressionSet> = mutableListOf(),
     var submitResponse: MfSubmitResponse = MfSubmitResponse(),
 )

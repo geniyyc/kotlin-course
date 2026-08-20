@@ -25,5 +25,10 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":math-face-common")
 include(":math-face-api-v1-jackson")
 include(":math-face-api-v1-mappers")
+include(":math-face-app-common")
+include(":math-face-stubs")
+include(":math-face-biz")
+include(":math-face-app-ktor")
+include(":math-face-app-kafka")
 
 rootProject.name = "math-face-be"

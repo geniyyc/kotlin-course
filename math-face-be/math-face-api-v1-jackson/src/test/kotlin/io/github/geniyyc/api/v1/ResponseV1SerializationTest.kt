@@ -11,10 +11,16 @@ class ResponseV1SerializationTest {
         taskId = "task-123",
         expressions = listOf(
             ExpressionResponseObject(
-                id = "1",
-                value = "2 + 4",
-                complexityId = 1,
-                description = "Simple addition"
+                ownerId = "owner-1",
+                expressions = listOf(
+                    BaseExpression(
+                        id = "1",
+                        value = "2 + 4",
+                        complexityId = 1,
+                        description = "Simple addition"
+                    )
+                ),
+                startTime = "2024-01-01T00:00:00Z"
             )
         )
     )
@@ -26,6 +32,7 @@ class ResponseV1SerializationTest {
         assertContains(json, "\"taskId\":\"task-123\"")
         assertContains(json, "\"value\":\"2 + 4\"")
         assertContains(json, "\"responseType\":\"generate\"")
+        assertContains(json, "\"ownerId\":\"owner-1\"")
     }
 
     @Test
