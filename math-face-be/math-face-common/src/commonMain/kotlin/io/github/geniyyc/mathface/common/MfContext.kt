@@ -4,6 +4,7 @@ import kotlinx.datetime.Instant
 import io.github.geniyyc.mathface.common.models.*
 
 data class MfContext(
+    var corSettings: MfCorSettings = MfCorSettings.NONE,
     var command: MfCommand = MfCommand.NONE,
     var state: MfState = MfState.NONE,
     val errors: MutableList<MfError> = mutableListOf(),
@@ -16,6 +17,12 @@ data class MfContext(
 
     var expressionFilterRequest: MfExpressionFilter = MfExpressionFilter(),
     var submitRequest: MfSubmitObject = MfSubmitObject(),
+
+    var expressionFilterValidating: MfExpressionFilter = MfExpressionFilter(),
+    var submitValidating: MfSubmitObject = MfSubmitObject(),
+
+    var expressionFilterValidated: MfExpressionFilter = MfExpressionFilter(),
+    var submitValidated: MfSubmitObject = MfSubmitObject(),
 
     var taskId: String = "",
     var expressionsResponse: MutableList<MfExpressionSet> = mutableListOf(),
