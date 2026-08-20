@@ -13,6 +13,8 @@ ktor = "3.4.3"
 kafka = "3.7.0"
 atomicfu = "0.23.2"
 logback = "1.5.3"
+cache4k = "0.13.0"
+uuid = "0.8.4"
 
 [libraries]
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -29,6 +31,9 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 jackson-datatype = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 kafka-client = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
 

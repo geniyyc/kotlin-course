@@ -31,3 +31,13 @@ fun MfContext.fail(error: MfError) {
     state = MfState.FAILING
     errors.add(error)
 }
+
+fun errorSystem(
+    violationCode: String,
+    e: Throwable,
+) = MfError(
+    code = "system-$violationCode",
+    group = "system",
+    message = "System error occurred. Please retry later",
+    exception = e,
+)

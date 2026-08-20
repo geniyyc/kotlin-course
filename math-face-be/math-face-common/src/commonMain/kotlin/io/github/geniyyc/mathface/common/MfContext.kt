@@ -2,6 +2,7 @@ package io.github.geniyyc.mathface.common
 
 import kotlinx.datetime.Instant
 import io.github.geniyyc.mathface.common.models.*
+import io.github.geniyyc.mathface.common.repo.IRepoExpression
 
 data class MfContext(
     var corSettings: MfCorSettings = MfCorSettings.NONE,
@@ -23,6 +24,12 @@ data class MfContext(
 
     var expressionFilterValidated: MfExpressionFilter = MfExpressionFilter(),
     var submitValidated: MfSubmitObject = MfSubmitObject(),
+
+    var expressionRepo: IRepoExpression = IRepoExpression.NONE,
+    var expressionRepoRead: MfExpression = MfExpression(),
+    var expressionRepoPrepare: MfExpression = MfExpression(),
+    var expressionRepoDone: MfExpression = MfExpression(),
+    var expressionsRepoDone: MutableList<MfExpression> = mutableListOf(),
 
     var taskId: String = "",
     var expressionsResponse: MutableList<MfExpressionSet> = mutableListOf(),

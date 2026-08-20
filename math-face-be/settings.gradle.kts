@@ -31,5 +31,9 @@ include(":math-face-biz")
 include(":math-face-app-ktor")
 include(":math-face-app-kafka")
 include(":math-face-lib-cor")
+include(":math-face-repo-common")
+include(":math-face-repo-stubs")
+include(":math-face-repo-inmemory")
+include(":math-face-repo-tests")
 
 rootProject.name = "math-face-be"
