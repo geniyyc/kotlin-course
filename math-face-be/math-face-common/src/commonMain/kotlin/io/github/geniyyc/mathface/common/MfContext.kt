@@ -29,6 +29,7 @@ data class MfContext(
     var expressionRepoRead: MfExpression = MfExpression(),
     var expressionRepoPrepare: MfExpression = MfExpression(),
     var expressionRepoDone: MfExpression = MfExpression(),
+    var expressionsRepoPrepare: MutableList<MfExpression> = mutableListOf(),
     var expressionsRepoDone: MutableList<MfExpression> = mutableListOf(),
 
     var taskId: String = "",

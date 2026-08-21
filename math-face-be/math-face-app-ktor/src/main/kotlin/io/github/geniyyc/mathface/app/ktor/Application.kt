@@ -2,6 +2,7 @@ package io.github.geniyyc.mathface.app.ktor
 
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import io.github.geniyyc.mathface.app.ktor.plugins.initAppSettings
 import io.github.geniyyc.mathface.app.ktor.v1.v1Expression
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
@@ -15,7 +16,7 @@ import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 
-fun Application.module(appSettings: MfAppSettings = MfAppSettings()) {
+fun Application.module(appSettings: MfAppSettings = initAppSettings()) {
     install(CORS) {
         anyHost()
     }

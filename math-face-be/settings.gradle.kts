@@ -35,5 +35,6 @@ include(":math-face-repo-common")
 include(":math-face-repo-stubs")
 include(":math-face-repo-inmemory")
 include(":math-face-repo-tests")
+include(":math-face-repo-pg")
 
 rootProject.name = "math-face-be"

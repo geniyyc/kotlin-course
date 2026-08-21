@@ -2,17 +2,29 @@ package io.github.geniyyc.mathface.biz.validation
 
 import io.github.geniyyc.mathface.biz.MfExpressionProcessor
 import io.github.geniyyc.mathface.common.MfContext
+import io.github.geniyyc.mathface.common.MfCorSettings
 import io.github.geniyyc.mathface.common.models.MfCommand
 import io.github.geniyyc.mathface.common.models.MfExpressionFilter
 import io.github.geniyyc.mathface.common.models.MfState
 import io.github.geniyyc.mathface.common.models.MfWorkMode
+import io.github.geniyyc.mathface.common.repo.DbExpressionRequest
+import io.github.geniyyc.mathface.common.repo.DbExpressionResponseOk
+import io.github.geniyyc.mathface.common.repo.DbExpressionsResponseOk
+import io.github.geniyyc.mathface.repo.tests.ExpressionRepositoryMock
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class BizValidationGenerateTest {
 
-    private val processor = MfExpressionProcessor()
+    private val processor = MfExpressionProcessor(
+        corSettings = MfCorSettings(
+            repoTest = ExpressionRepositoryMock(
+                invokeSearchExpression = { DbExpressionsResponseOk(emptyList()) },
+                invokeCreateExpression = { DbExpressionResponseOk(it.expression.copy(id = io.github.geniyyc.mathface.common.models.MfExpressionId("expr-1"))) }
+            )
+        )
+    )
 
     @Test
     fun emptyLevel() = runTest {
@@ -46,7 +58,7 @@ class BizValidationGenerateTest {
             expressionFilterRequest = MfExpressionFilter(level = 5),
         )
         processor.exec(ctx)
-        assertEquals(MfState.RUNNING, ctx.state)
+        assertEquals(MfState.FINISHING, ctx.state)
         assertEquals(0, ctx.errors.size)
         assertEquals(5, ctx.expressionFilterValidated.level)
     }

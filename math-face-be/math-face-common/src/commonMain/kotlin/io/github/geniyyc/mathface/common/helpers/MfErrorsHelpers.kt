@@ -32,6 +32,11 @@ fun MfContext.fail(error: MfError) {
     errors.add(error)
 }
 
+fun MfContext.fail(errors: List<MfError>) {
+    state = MfState.FAILING
+    this.errors.addAll(errors)
+}
+
 fun errorSystem(
     violationCode: String,
     e: Throwable,

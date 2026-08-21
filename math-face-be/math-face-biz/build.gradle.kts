@@ -12,4 +12,5 @@ dependencies {
 
     testImplementation(kotlin("test-junit"))
     testImplementation(libs.coroutines.test)
+    testImplementation(projects.mathFaceRepoTests)
 }

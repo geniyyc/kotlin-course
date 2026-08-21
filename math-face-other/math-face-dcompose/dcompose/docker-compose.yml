@@ -1,10 +1,45 @@
 version: '3.8'
 
 services:
+  psql:
+    image: postgres
+    container_name: math-face-psql
+    hostname: psql
+    environment:
+      POSTGRES_PASSWORD: "math-face-pass"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "math_face"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  liquibase:
+    image: math-face-migration-pg:${VERSION:-latest}
+    environment:
+      LIQUIBASE_COMMAND_URL: jdbc:postgresql://psql:5432/math_face
+      LIQUIBASE_COMMAND_USERNAME: postgres
+      LIQUIBASE_COMMAND_PASSWORD: "math-face-pass"
+      LIQUIBASE_LIQUIBASE_SCHEMA_NAME: public
+    depends_on:
+      psql:
+        condition: service_healthy
+
   app:
     image: math-face-app:${VERSION:-latest}
     ports:
       - "8080:8080"
+    environment:
+      MATHFACE_REPOSITORY_PROD: postgres
+      MKPLADS_HOST: psql
+      MKPLADS_PORT: 5432
+      MKPLADS_DB: math_face
+      MKPLADS_USER: postgres
+      MKPLADS_PASS: math-face-pass
+    depends_on:
+      liquibase:
+        condition: service_completed_successfully
 
   kafka:
     image: apache/kafka:latest
@@ -32,7 +67,14 @@ services:
     image: math-face-app-kafka:${VERSION:-latest}
     depends_on:
       - kafka
+      - liquibase
     environment:
       KAFKA_HOSTS: kafka:19092
       KAFKA_TOPIC_IN_V1: math-face-expression-v1-in
       KAFKA_TOPIC_OUT_V1: math-face-expression-v1-out
+      MATHFACE_REPOSITORY_PROD: postgres
+      MKPLADS_HOST: psql
+      MKPLADS_PORT: 5432
+      MKPLADS_DB: math_face
+      MKPLADS_USER: postgres
+      MKPLADS_PASS: math-face-pass
