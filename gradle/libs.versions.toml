@@ -13,6 +13,11 @@ ktor = "3.4.3"
 kafka = "3.7.0"
 atomicfu = "0.23.2"
 logback = "1.5.3"
+cache4k = "0.13.0"
+uuid = "0.8.4"
+sqlx4k = "1.9.1"
+testcontainers = "1.20.6"
+liquibase = "4.27.0"
 
 [libraries]
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -30,7 +35,18 @@ jackson-datatype = { module = "com.fasterxml.jackson.datatype:jackson-datatype-j
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
+cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+
 kafka-client = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
+
+sqlx4k-core = { module = "io.github.smyrgeorge:sqlx4k", version.ref = "sqlx4k" }
+sqlx4k-postgres = { module = "io.github.smyrgeorge:sqlx4k-postgres", version.ref = "sqlx4k" }
+
+testcontainers-core = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+
+liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
 
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }

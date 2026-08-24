@@ -8,7 +8,9 @@ dependencies {
 
     implementation(projects.mathFaceCommon)
     implementation(projects.mathFaceStubs)
+    implementation(projects.mathFaceLibCor)
 
     testImplementation(kotlin("test-junit"))
     testImplementation(libs.coroutines.test)
+    testImplementation(projects.mathFaceRepoTests)
 }

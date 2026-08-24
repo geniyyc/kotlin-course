@@ -4,6 +4,13 @@ plugins {
     alias(libs.plugins.shadow.jar)
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+        force("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.6.0")
+    }
+}
+
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
@@ -32,6 +39,9 @@ dependencies {
     implementation(projects.mathFaceApiV1Jackson)
     implementation(projects.mathFaceApiV1Mappers)
     implementation(projects.mathFaceBiz)
+    implementation(projects.mathFaceRepoStubs)
+    implementation(projects.mathFaceRepoInmemory)
+    implementation(projects.mathFaceRepoPg)
 
     testImplementation(kotlin("test-junit"))
     testImplementation(libs.ktor.server.test.host)
