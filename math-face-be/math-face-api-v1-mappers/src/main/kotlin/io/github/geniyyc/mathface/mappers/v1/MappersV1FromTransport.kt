@@ -7,13 +7,11 @@ import io.github.geniyyc.api.v1.models.ExpressionRequestDebugStubs
 import io.github.geniyyc.api.v1.models.ExpressionSubmitRequest
 import io.github.geniyyc.api.v1.models.GenerateObject
 import io.github.geniyyc.api.v1.models.IRequest
-import io.github.geniyyc.api.v1.models.SubmitAnswerObject
 import io.github.geniyyc.api.v1.models.SubmitObject
 import io.github.geniyyc.mathface.common.MfContext
 import io.github.geniyyc.mathface.common.models.MfCommand
 import io.github.geniyyc.mathface.common.models.MfExpressionFilter
 import io.github.geniyyc.mathface.common.models.MfExpressionId
-import io.github.geniyyc.mathface.common.models.MfSolution
 import io.github.geniyyc.mathface.common.models.MfStubs
 import io.github.geniyyc.mathface.common.models.MfSubmitObject
 import io.github.geniyyc.mathface.common.models.MfWorkMode
@@ -64,13 +62,6 @@ fun MfContext.fromTransport(request: ExpressionSubmitRequest) {
 }
 
 private fun SubmitObject?.toInternal(): MfSubmitObject = MfSubmitObject(
-    groupId = this?.groupId ?: "",
-    answers = this?.answers?.map { it.toInternal() }?.toMutableList() ?: mutableListOf(),
-)
-
-private fun SubmitAnswerObject?.toInternal(): MfSolution = MfSolution(
     expressionId = this?.expressionId.toExpressionId(),
-    expressionValue = this?.expressionValue ?: "",
-    solutionValue = this?.solutionValue ?: "",
-    solutionTime = this?.solutionTime ?: "",
+    answer = this?.answer ?: "",
 )

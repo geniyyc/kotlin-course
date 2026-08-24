@@ -20,4 +20,5 @@ pluginManagement {
 include(":math-face-specs")
 include(":math-face-swagger")
 include(":math-face-dcompose")
+include(":math-face-migration-pg")
 

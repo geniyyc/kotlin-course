@@ -123,9 +123,12 @@ components:
       type: object
       description: Объект описывает свойства, одинаковые для create и update
       properties:
+        id:
+          $ref: '#/components/schemas/ExpressionId'
+          description: Идентификатор примера
         value:
           type: string
-          description: Математическое выражение для решения
+          description: Математическое выражение для решения (2 + 2 =)
         complexityId:
           type: integer
           description: Идентификатор уровня сложности
@@ -169,15 +172,14 @@ components:
 
     SubmitObject:
       type: object
-      description: Пакет ответов для отправки
+      description: Отправка одного ответа на выражение
       properties:
-        groupId:
+        expressionId:
+          $ref: '#/components/schemas/ExpressionId'
+          description: Идентификатор примера
+        answer:
           type: string
-          description: Идентификатор группы (задания)
-        answers:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubmitAnswerObject'
+          description: Ответ пользователя
 
     ExpressionSubmitRequest:
       allOf:
@@ -190,14 +192,19 @@ components:
 
     ExpressionResponseObject:
       allOf:
-        - $ref: '#/components/schemas/BaseExpression'
         - type: object
           description: Объект, который возвращается в ответе бэкенда
           properties:
-            id:
-              $ref: '#/components/schemas/ExpressionId'
             ownerId:
               $ref: '#/components/schemas/UserId'
+            expressions:
+              type: array
+              description: Массив выражений для решения
+              items:
+                $ref: '#/components/schemas/BaseExpression'
+            startTime:
+              type: string
+              description: Время начала генерации
 
     ExpressionGenerateResponse:
       allOf:
@@ -219,13 +226,16 @@ components:
           properties:
             decision:
               type: string
-              description: Результат проверки (STAY, LEVEL_UP, LEVEL_UP_2)
+              description: Результат проверки (STAY, LEVEL_UP)
             message:
               type: string
               description: Сообщение для пользователя
             nextLevel:
               type: integer
               description: Следующий уровень сложности
+            endTime:
+              type: string
+              description: Время решения
 
     # STUBS ======================
     ExpressionRequestDebugMode:
