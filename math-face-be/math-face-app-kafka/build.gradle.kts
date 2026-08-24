@@ -20,6 +20,8 @@ dependencies {
     implementation(projects.mathFaceApiV1Jackson)
     implementation(projects.mathFaceApiV1Mappers)
     implementation(projects.mathFaceBiz)
+    implementation(projects.mathFaceRepoStubs)
+    implementation(projects.mathFaceRepoInmemory)
 
     testImplementation(kotlin("test-junit"))
     testImplementation(libs.coroutines.test)

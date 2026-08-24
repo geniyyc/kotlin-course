@@ -3,6 +3,13 @@ package io.github.geniyyc.mathface.biz
 import io.github.geniyyc.mathface.biz.general.initStatus
 import io.github.geniyyc.mathface.biz.general.operation
 import io.github.geniyyc.mathface.biz.general.stubs
+import io.github.geniyyc.mathface.biz.repo.generateExpressionsIfEmpty
+import io.github.geniyyc.mathface.biz.repo.initRepo
+import io.github.geniyyc.mathface.biz.repo.prepareResult
+import io.github.geniyyc.mathface.biz.repo.prepareSubmit
+import io.github.geniyyc.mathface.biz.repo.repoCreateExpressions
+import io.github.geniyyc.mathface.biz.repo.repoRead
+import io.github.geniyyc.mathface.biz.repo.repoSearch
 import io.github.geniyyc.mathface.biz.stubs.stubDbError
 import io.github.geniyyc.mathface.biz.stubs.stubGenerateSuccess
 import io.github.geniyyc.mathface.biz.stubs.stubNoCase
@@ -22,6 +29,7 @@ import io.github.geniyyc.mathface.biz.validation.validation
 import io.github.geniyyc.mathface.common.MfContext
 import io.github.geniyyc.mathface.common.MfCorSettings
 import io.github.geniyyc.mathface.common.models.MfCommand
+import io.github.geniyyc.mathface.cor.chain
 import io.github.geniyyc.mathface.cor.rootChain
 import io.github.geniyyc.mathface.cor.worker
 
@@ -30,6 +38,7 @@ class MfExpressionProcessor(private val corSettings: MfCorSettings = MfCorSettin
 
     private val businessChain = rootChain<MfContext> {
         initStatus("Инициализация статуса")
+        initRepo("Инициализация репозитория")
 
         operation("Генерация примеров", MfCommand.GENERATE) {
             stubs("Обработка стабов") {
@@ -49,6 +58,13 @@ class MfExpressionProcessor(private val corSettings: MfCorSettings = MfCorSettin
                 validateLevelProperRange("Уровень должен быть в диапазоне 1..10")
                 finishExpressionFilterValidation("Завершение проверок")
             }
+            chain {
+                title = "Логика поиска и сохранения"
+                repoSearch("Поиск выражений в БД")
+                generateExpressionsIfEmpty("Генерация примеров при отсутствии в БД")
+                repoCreateExpressions("Сохранение сгенерированных выражений в БД")
+            }
+            prepareResult("Подготовка ответа")
         }
 
         operation("Отправка ответа", MfCommand.SUBMIT) {
@@ -69,6 +85,12 @@ class MfExpressionProcessor(private val corSettings: MfCorSettings = MfCorSettin
                 validateAnswerNotEmpty("Ответ должен быть задан")
                 finishSubmitValidation("Завершение проверок")
             }
+            chain {
+                title = "Логика чтения и проверки"
+                prepareSubmit("Подготовка объекта для чтения")
+                repoRead("Чтение выражения из БД")
+            }
+            prepareResult("Подготовка ответа")
         }
     }.build()
 }

@@ -1,0 +1,16 @@
+stages:
+  Default:
+    actions:
+      - type: liquibase
+        command: checks run
+        cmdArgs: {checks-scope: changelog}
+      - type: liquibase
+        command: update
+      - type: liquibase
+        command: checks run
+        cmdArgs: {checks-scope: database}
+
+endStage:
+  actions:
+    - type: liquibase
+      command: history
