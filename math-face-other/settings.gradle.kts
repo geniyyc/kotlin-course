@@ -1,0 +1,24 @@
+rootProject.name = "math-face-other"
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
+}
+
+pluginManagement {
+    includeBuild("../build-plugin")
+
+    plugins {
+        id("build-jvm")
+        id("build-kmp") apply false
+    }
+}
+
+include(":math-face-specs")
+include(":math-face-swagger")
+include(":math-face-dcompose")
+include(":math-face-migration-pg")
+
