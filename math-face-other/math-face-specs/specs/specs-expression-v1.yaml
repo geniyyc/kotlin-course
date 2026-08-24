@@ -1,0 +1,272 @@
+openapi: 3.0.3
+info:
+  title: "MathFace"
+  description: API платформы MathFace для генерации математических примеров с прогрессией сложности и проверки решений
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+tags:
+  - name: expression
+    description: Математическое выражение (пример)
+paths:
+  /expression/generate:
+    post:
+      tags:
+        - expression
+      summary: Generate expressions batch
+      operationId: expressionGenerate
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpressionGenerateRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpressionGenerateResponse'
+  /expression/submit:
+    post:
+      tags:
+        - expression
+      summary: Submit answers for a batch
+      operationId: expressionSubmit
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpressionSubmitRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpressionSubmitResponse'
+
+components:
+  schemas:
+
+    IRequest:
+      type: object
+      description: Базовый интерфейс для всех запросов
+      properties:
+        requestType:
+          type: string
+          description: Поле-дескриминатор для вычисления типа запроса
+          example: generate
+      discriminator:
+        propertyName: requestType
+        mapping:
+          generate: '#/components/schemas/ExpressionGenerateRequest'
+          submit: '#/components/schemas/ExpressionSubmitRequest'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        group:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+
+    ResponseResult:
+      type: string
+      enum:
+        - success
+        - error
+
+    IResponse:
+      type: object
+      description: Базовый интерфейс для всех ответов
+      properties:
+        responseType:
+          type: string
+          description: Поле-дескриминатор для вычисления типа ответа
+          example: generate
+        result:
+          $ref: '#/components/schemas/ResponseResult'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+
+      discriminator:
+        propertyName: responseType
+        mapping:
+          generate: '#/components/schemas/ExpressionGenerateResponse'
+          submit: '#/components/schemas/ExpressionSubmitResponse'
+
+    UserId:
+      type: string
+      description: Идентификатор пользователя
+    ExpressionId:
+      type: string
+      description: Идентификатор выражения
+    ExpressionLock:
+      type: string
+      description: Версия оптимистичной блокировки
+
+    BaseExpression:
+      type: object
+      description: Объект описывает свойства, одинаковые для create и update
+      properties:
+        id:
+          $ref: '#/components/schemas/ExpressionId'
+          description: Идентификатор примера
+        value:
+          type: string
+          description: Математическое выражение для решения (2 + 2 =)
+        complexityId:
+          type: integer
+          description: Идентификатор уровня сложности
+        description:
+          type: string
+          description: Описание или подсказка к решению
+
+    GenerateObject:
+      type: object
+      description: Параметры генерации набора примеров
+      properties:
+        level:
+          type: integer
+          description: Уровень сложности для генерации
+
+    ExpressionGenerateRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/ExpressionRequestDebug'
+        - type: object
+          properties:
+            expression:
+              $ref: '#/components/schemas/GenerateObject'
+
+    SubmitAnswerObject:
+      type: object
+      description: Ответ пользователя на конкретное выражение
+      properties:
+        expressionId:
+          $ref: '#/components/schemas/ExpressionId'
+        solutionValue:
+          type: string
+          description: Ответ пользователя
+        expressionValue:
+          type: string
+          description: Запись выражения
+        solutionTime:
+          type: string
+          format: date-time
+          description: Время решения
+
+    SubmitObject:
+      type: object
+      description: Отправка одного ответа на выражение
+      properties:
+        expressionId:
+          $ref: '#/components/schemas/ExpressionId'
+          description: Идентификатор примера
+        answer:
+          type: string
+          description: Ответ пользователя
+
+    ExpressionSubmitRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/ExpressionRequestDebug'
+        - type: object
+          properties:
+            expression:
+              $ref: '#/components/schemas/SubmitObject'
+
+    ExpressionResponseObject:
+      allOf:
+        - type: object
+          description: Объект, который возвращается в ответе бэкенда
+          properties:
+            ownerId:
+              $ref: '#/components/schemas/UserId'
+            expressions:
+              type: array
+              description: Массив выражений для решения
+              items:
+                $ref: '#/components/schemas/BaseExpression'
+            startTime:
+              type: string
+              description: Время начала генерации
+
+    ExpressionGenerateResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            taskId:
+              type: string
+              description: Идентификатор сгенерированного задания
+            expressions:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExpressionResponseObject'
+
+    ExpressionSubmitResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            decision:
+              type: string
+              description: Результат проверки (STAY, LEVEL_UP)
+            message:
+              type: string
+              description: Сообщение для пользователя
+            nextLevel:
+              type: integer
+              description: Следующий уровень сложности
+            endTime:
+              type: string
+              description: Время решения
+
+    # STUBS ======================
+    ExpressionRequestDebugMode:
+      type: string
+      enum:
+        - prod
+        - test
+        - stub
+
+    ExpressionRequestDebug:
+      type: object
+      properties:
+        debug:
+          $ref: '#/components/schemas/ExpressionDebug'
+
+    ExpressionDebug:
+      type: object
+      properties:
+        mode:
+          $ref: '#/components/schemas/ExpressionRequestDebugMode'
+        stub:
+          $ref: '#/components/schemas/ExpressionRequestDebugStubs'
+
+    ExpressionRequestDebugStubs:
+      type: string
+      description: Перечисления всех стабов
+      enum:
+        - success
+        - notFound
+        - badId
+        - badLevel
+        - badValue
+        - cannotDelete
+        - badSearchString
